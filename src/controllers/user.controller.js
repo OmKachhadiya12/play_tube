@@ -4,6 +4,7 @@ import User from "./../models/user.model.js";
 import {uploadOnCloudinary} from "./../utils/cloudinary.js";
 import {apiResponse} from "./../utils/apiResponse.js";
 
+
 const generateAccessAndRefreshToken =  async(userId) => {
   try{
     const user = await User.findById(userId);
@@ -20,10 +21,11 @@ const generateAccessAndRefreshToken =  async(userId) => {
   }
 }
 
+
 const registerUser = asyncHandler(async (req, res) => {
     const { fullName, email, username, password } = req.body;
     
-  if ([fullName, email, username, password].some((feild) => {feild?.trim() == "";})) {
+  if ([fullName, email, username, password].some((field) => {field?.trim() == "";})) {
     throw new apiError(400, "All fields are Required.");
 }
 
@@ -36,7 +38,7 @@ const existedUser = await User.findOne({
     }
     
     const avatarLocalPath = req.files?.avatar[0].path;
-    const coverImageLocalPath = req.files?.coverImage.path;
+    const coverImageLocalPath = req.files?.coverImage[0].path;
 
   if(avatarLocalPath) {
     throw new apiError(400,"Avatar is required.");
@@ -58,7 +60,7 @@ const existedUser = await User.findOne({
     username: username.toLowerCase()
   });
 
-  const createdUser = User.findById(user._id).select("-password -refreshToken");
+  const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
   if(!createdUser) {
     throw new apiError(500,"Something went wrong.");
@@ -69,6 +71,7 @@ const existedUser = await User.findOne({
   )
 
 });
+
 
 const loginUser = asyncHandler(async(req,res) => {
   const {username,email,password} = req.body;
@@ -106,6 +109,7 @@ const loginUser = asyncHandler(async(req,res) => {
 
 });
 
+
 const logoutUser = asyncHandler(async(req,res) => {
   await User.findByIdAndUpdate(req.user._id,
     { $set: { refreshToken: undefined } },
@@ -116,8 +120,11 @@ const logoutUser = asyncHandler(async(req,res) => {
       secure: true
     }
 
-    return res.status.clearCookie("accessToken",options).clearCookie("refreshToken",options).json(new apiResponse(200,{},"User logged out. "));
+    return res.status.clearCookie("accessToken",options).clearCookie("refreshToken",options).json(
+      new apiResponse(200,{},"User logged out. "
+      ));
 
 });
+
 
 export { registerUser, loginUser,logoutUser};
