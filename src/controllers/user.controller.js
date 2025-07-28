@@ -300,7 +300,7 @@ const getUserChannelProfile = asyncHandler(async(req,res) => {
     throw new apiError(400,"Channel doesn't exist.");
   }
 
-  return res.status(200).json(new apiResponse(200,,channel[0],"User channel details fetched sucessfully."));
+  return res.status(200).json(new apiResponse(200,channel[0],"User channel details fetched sucessfully."));
 
 });
 
